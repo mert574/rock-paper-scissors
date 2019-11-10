@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: Asul-Bold
+font link: https://fonts.google.com/specimen/Asul
+font author: Mariela Monsalve
+font author site: http://www.mukamonsalve.com.ar/
+Slogan Font: Questrial-Regular.otf
+
+icon designer: Studio Fibonacci
+icon designer link: /StudioFibonacci
+        
+{"bg":"#411640","icon":"#DCB933","font":"#FFFFFF","slogan":"#ffffff"}
+      

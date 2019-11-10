@@ -1,0 +1,10 @@
+<button nz-button nzType="primary">
+    <i nz-icon nzType="plus" nzTheme="outline"></i>
+    Create a New Game
+</button>
+<h1>Active Games <span *ngIf="games">({{ games.length }})</span></h1>
+<ul>
+    <li *ngFor="let game of games">
+        {{ game.id }} - {{ game.player.name }}
+    </li>
+</ul>
