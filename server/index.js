@@ -1,38 +1,42 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+
+const entity = require("./entity");
+const gameController = require("./controllers/game.controller");
+const playerController = require("./controllers/player.controller");
+const gameHandler = require("./handlers/game.handler");
+const initializeDB = require("./config/db.config");
+
 const app = express();
 const port = 6378;
 
 app.use(cors());
 
-const GameStatus = {
-    ACTIVE: 1,
-    PLAYING: 2,
-    FINISHED: 3,
-};
+app.use("/api/game", gameController);
+app.use("/api/player", playerController);
 
-const activeGames = [
-    {
-        id: 1,
-        player: {
-            name: 'creator-1',
-        },
-        opponent: {
-            name: 'joiner'
-        },
-        createdAt: new Date(),
-        status: GameStatus.PLAYING,
-    },
-    {
-        id: 2,
-        player: {
-            name: 'creator-2',
-        },
-        createdAt: new Date(),
-        status: GameStatus.ACTIVE,
-    }
-];
+app.use(function(req, res, next) {
+  res.status(500).json("Error.").end();
+});
 
-app.get('/games', (req, res) => res.json(activeGames));
+initializeDB().then(generateMockData);
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`RPS app listening on port ${port}!`));
+
+// ------
+
+async function generateMockData() {
+  const player1 = await entity.player.create({ _id: "1", name: "John Doe" });
+  const player2 = await entity.player.create({ _id: "2", name: "Keanu Reeves" });
+
+  await player1.save();
+  await player2.save();
+
+  const listing1 = await gameHandler.createGameListing(player1, "1");
+  const listing2 = await gameHandler.createGameListing(player2, "2");
+
+  await listing1.save();
+  await listing2.save();
+
+  await gameHandler.joinGame("1", player2);
+}
