@@ -5,7 +5,10 @@ const playerHandler = require('../handlers/player.handler');
 // hooks
 router
   .get('/', getAllGamesController)
+  .get('/active', getActiveGamesController)
+  .get('/past', getPastGamesController)
   .get('/:gameId', getGameController)
+  .post('/create/:playerId', createGameController)
   .post('/:gameId/join/:opponentId', joinGameController)
   .post('/:gameId/play/:playerId/:move', playGameController);
 
@@ -15,6 +18,28 @@ async function getAllGamesController(req, res) {
 
   try {
     const games = await gameHandler.getAllGameListings();
+    res.json(games).end();
+  } catch (e) {
+    res.status(500).json({ error: e.message }).end();
+  }
+}
+
+async function getActiveGamesController(req, res) {
+  console.log(`[GET] getActiveGames`);
+
+  try {
+    const games = await gameHandler.getActiveGameListings();
+    res.json(games).end();
+  } catch (e) {
+    res.status(500).json({ error: e.message }).end();
+  }
+}
+
+async function getPastGamesController(req, res) {
+  console.log(`[GET] getPastGames`);
+
+  try {
+    const games = await gameHandler.getPastGameListings();
     res.json(games).end();
   } catch (e) {
     res.status(500).json({ error: e.message }).end();
@@ -39,6 +64,24 @@ async function getGameController(req, res, next) {
 
     res.json(game).end();
 
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function createGameController(req, res, next) {
+  const { playerId } = req.params;
+  console.log(`[POST] createGame: ${playerId}`);
+
+  try {
+    const player = await playerHandler.getPlayerById(playerId);
+    if (!player) {
+      res.status(404).end();
+      return;
+    }
+
+    const listing = await gameHandler.createPlayerGame(player);
+    res.json(listing).end();
   } catch (e) {
     next(e);
   }

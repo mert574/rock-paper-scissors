@@ -1,0 +1,20 @@
+<button nz-button [nzType]="'primary'" (click)="showModal()">
+  <i nz-icon nzType="plus"></i>
+  Create a New Game
+</button>
+
+<nz-modal
+  [(nzVisible)]="isVisible"
+  nzTitle="Create a New Game"
+  (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()"
+  [nzFooter]="nzFooter"
+>
+  <p>You're about to create a new game.</p>
+  <ng-template #nzFooter>
+    <button nz-button [nzType]="'primary'" (click)="handleOk()">
+      <i nz-icon nzType="plus"></i>
+      Create
+    </button>
+  </ng-template>
+</nz-modal>

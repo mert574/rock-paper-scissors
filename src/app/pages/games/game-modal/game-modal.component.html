@@ -1,0 +1,18 @@
+<nz-modal
+  [(nzVisible)]="isVisible"
+  nzTitle="Playing Rock, Paper, Scissors"
+  (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()"
+  [nzFooter]="nzFooter"
+>
+  <p>Time left to choose:</p> 0
+  <br>
+  <p>Choose a move for this round !</p>
+  <div class="choices">
+    <img src="../../../../assets/rock.png" alt="Rock" (click)="choice('ROCK')" />
+    <img src="../../../../assets/paper.png" alt="Paper" (click)="choice('PAPER')" />
+    <img src="../../../../assets/scissors.png" alt="Scissors" (click)="choice('SCISSORS')" />
+  </div>
+  <ng-template #nzFooter>
+  </ng-template>
+</nz-modal>

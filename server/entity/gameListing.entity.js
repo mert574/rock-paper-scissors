@@ -5,7 +5,7 @@ const Game = require("./game.entity");
 class GameListing extends Document {
   status = {
     type: String,
-    choices: ["ACTIVE", "PLAYING", "FINISHED"],
+    choices: ["ACTIVE", "PLAYING", "FINISHED", "EXPIRED"],
     default: "ACTIVE",
   };
 

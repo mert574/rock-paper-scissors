@@ -1,16 +1,24 @@
 const entity = require("../entity");
 
 // TODO: expired rps handling
-const ROUND_TIMEOUT_SEC = 999999;
+const ROUND_TIMEOUT_SEC = 30;
 
 // ---------------------
 
 function getAllGameListings() {
-  return entity.gameListing.find({}, { populate: true });
+  return entity.gameListing.find({}, {populate: true});
+}
+
+function getActiveGameListings() {
+  return entity.gameListing.find({$or: [{status: 'ACTIVE'}, {status: 'PLAYING'}]}, {populate: true});
+}
+
+function getPastGameListings() {
+  return entity.gameListing.find({$or: [{status: 'FINISHED'}, {status: 'EXPIRED'}]}, {populate: true});
 }
 
 function getGameListingById(gameId) {
-  return entity.gameListing.findOne({ _id: gameId }, { populate: true });
+  return entity.gameListing.findOne({_id: gameId}, {populate: true});
 }
 
 async function joinGame(gameId, opponent) {
@@ -70,8 +78,34 @@ async function playGame(gameId, player, move) {
   return gameListing;
 }
 
+async function createPlayerGame(player) {
+  const game = entity.gameListing.create({player});
+  return game.save();
+}
+
 // ---------------------
 // Helpers
+
+// auto expiry checker
+setTimeout(() => {
+  (async function checkExpiration() {
+    const listings = await getAllGameListings();
+    listings.forEach(it => {
+      if (it.status !== 'PLAYING') {
+        return;
+      }
+      if (Date.now() >= it.game.currentRound.roundEndsAt) {
+        it.game.pastRounds.push(it.game.currentRound);
+        it.game.currentRound = null;
+        it.status = 'EXPIRED';
+        it.save();
+
+        console.log("found a game that is expired!");
+      }
+    });
+    setTimeout(checkExpiration, 5000);
+  })();
+}, 1000);
 
 function getRPSWinner(player, opponent) {
   if (player === opponent) {
@@ -100,11 +134,11 @@ function getScoreTable(pastRounds) {
       }
     }
     return acc;
-  }, { player: 0, opponent: 0 });
+  }, {player: 0, opponent: 0});
 }
 
 function playGameRound(gameListing, move, moveKey) {
-  const { game } = gameListing;
+  const {game} = gameListing;
   const round = game.currentRound;
 
   // play the round
@@ -140,16 +174,16 @@ function playGameRound(gameListing, move, moveKey) {
 
 function createGameRound(round) {
   const roundEndsAt = Date.now() + ROUND_TIMEOUT_SEC * 1000;
-  return entity.gameRound.create({ round, roundEndsAt });
+  return entity.gameRound.create({round, roundEndsAt});
 }
 
 function createGame() {
   const firstRound = createGameRound(1);
-  return entity.game.create({ currentRound: firstRound });
+  return entity.game.create({currentRound: firstRound});
 }
 
 function createGameListing(player, _id, rest) {
-  return entity.gameListing.create({ _id, player: player, ...rest });
+  return entity.gameListing.create({_id, player: player, ...rest});
 }
 
 module.exports = {
@@ -157,5 +191,8 @@ module.exports = {
   getGameListingById,
   joinGame,
   playGame,
+  createPlayerGame,
   createGameListing,
+  getActiveGameListings,
+  getPastGameListings,
 };

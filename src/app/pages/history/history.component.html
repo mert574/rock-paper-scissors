@@ -1,4 +1,33 @@
-<h1>Past Games (1)</h1>
-<ul>
-    <li>game-1</li>
-</ul>
+<h1 nz-title>Past Games <span *ngIf="games">({{ games.length }})</span></h1>
+
+<nz-list [nzDataSource]="games" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="false">
+  <ng-template #item let-item>
+    <nz-list-item [nzActions]="[playOrWatch]">
+      <nz-list-item-meta
+        [nzTitle]="nzTitle"
+        nzAvatar="/assets/game.png"
+        [nzDescription]="nzDescription"
+      >
+        <ng-template #nzTitle>
+          {{ item.player.name }}
+          <strong>VS&nbsp;</strong>
+          <span *ngIf="item.opponent">{{ item.opponent.name }}</span>
+          <span *ngIf="!item.opponent"> — </span>
+        </ng-template>
+        <ng-template #nzDescription>
+          <div [ngSwitch]="item.status">
+            <span *ngSwitchCase="'FINISHED'">
+            Score: <strong> {{ calculateScores(item).player }} - {{ calculateScores(item).opponent }}</strong>
+          </span>
+            <span *ngSwitchCase="'EXPIRED'">Expired</span>
+          </div>
+        </ng-template>
+      </nz-list-item-meta>
+      <ng-template #playOrWatch>
+        <div [ngSwitch]="item.status">
+          <button nz-button nzType="link" disabled *ngSwitchDefault>FINISHED</button>
+        </div>
+      </ng-template>
+    </nz-list-item>
+  </ng-template>
+</nz-list>

@@ -1,10 +1,42 @@
-<button nz-button nzType="primary">
-    <i nz-icon nzType="plus" nzTheme="outline"></i>
-    Create a New Game
-</button>
-<h1>Active Games <span *ngIf="games">({{ games.length }})</span></h1>
-<ul>
-    <li *ngFor="let game of games">
-        {{ game.id }} - {{ game.player.name }}
-    </li>
-</ul>
+<h1 nz-title>Active Games <span *ngIf="games">({{ games.length }})</span></h1>
+
+<app-new-game-modal (create)="handleCreate()"></app-new-game-modal>
+<app-game-modal (choose)="handleChoose($event)"></app-game-modal>
+<input nz-input type="text" [(ngModel)]="playerId">
+<nz-list [nzDataSource]="games" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="false">
+  <ng-template #item let-item>
+    <nz-list-item [nzActions]="[playOrWatch]">
+      <nz-list-item-meta
+        [nzTitle]="nzTitle"
+        nzAvatar="/assets/game.png"
+        [nzDescription]="nzDescription"
+      >
+        <ng-template #nzTitle>
+          {{ item.player.name }}
+          <strong>VS&nbsp;</strong>
+          <span *ngIf="item.opponent">{{ item.opponent.name }}</span>
+          <span *ngIf="!item.opponent"> — </span>
+        </ng-template>
+        <ng-template #nzDescription>
+          <div [ngSwitch]="item.status">
+            <em *ngIf="item.status === 'ACTIVE'">Waiting someone to join...</em>
+            <span *ngSwitchCase="'PLAYING'">
+            Score: <strong> {{ calculateScores(item).player }} - {{ calculateScores(item).opponent }}</strong>
+          </span>
+            <span *ngSwitchCase="'EXPIRED'">Expired</span>
+            <span *ngSwitchCase="'FINISHED'">Expired</span>
+          </div>
+        </ng-template>
+      </nz-list-item-meta>
+      <ng-template #playOrWatch>
+        <countdown *ngIf="item.status === 'PLAYING'"
+                   [config]="{ stopTime: parseDate(item.game.currentRound.roundEndsAt) }"></countdown>
+        <div [ngSwitch]="item.status">
+          <button nz-button nzType="link" *ngSwitchCase="'ACTIVE'" (click)="handleJoinGame(item)">JOIN</button>
+          <button nz-button nzType="link" *ngSwitchCase="'PLAYING'" (click)="handleOpenModal(item)">WATCH</button>
+          <button nz-button nzType="link" disabled *ngSwitchDefault>FINISHED</button>
+        </div>
+      </ng-template>
+    </nz-list-item>
+  </ng-template>
+</nz-list>
