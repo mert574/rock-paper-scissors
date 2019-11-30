@@ -5,14 +5,42 @@
   (nzOnOk)="handleOk()"
   [nzFooter]="nzFooter"
 >
-  <p>Time left to choose:</p> 0
-  <br>
-  <p>Choose a move for this round !</p>
-  <div class="choices">
-    <img src="../../../../assets/rock.png" alt="Rock" (click)="choice('ROCK')" />
-    <img src="../../../../assets/paper.png" alt="Paper" (click)="choice('PAPER')" />
-    <img src="../../../../assets/scissors.png" alt="Scissors" (click)="choice('SCISSORS')" />
+  <div *ngIf="game?.status === 'PLAYING'">
+    <p>Time left to choose:</p>
+    <countdown [config]="{ stopTime: date }"></countdown>
+    <br>
+    <p>{{ game.player.name }}: {{ scores.player }} - {{ game.opponent.name }}: {{ scores.opponent }}</p>
+    <p>Round: {{ game.game.currentRound?.round }}</p>
+    <div class="other-side-played" *ngIf="otherSideMove">
+      <strong>Other side played !</strong>
+    </div>
+    <div class="play-area" *ngIf="playerId && !myCurrentMove">
+      <p>Choose a move for this round !</p>
+      <div class="choices">
+        <img src="../../../../assets/rock.png" alt="Rock" (click)="choice('ROCK')"/>
+        <img src="../../../../assets/paper.png" alt="Paper" (click)="choice('PAPER')"/>
+        <img src="../../../../assets/scissors.png" alt="Scissors" (click)="choice('SCISSORS')"/>
+      </div>
+    </div>
   </div>
-  <ng-template #nzFooter>
-  </ng-template>
+  <div class="played" *ngIf="myCurrentMove">
+    You've played: <strong>{{ myCurrentMove }}</strong>.
+    <br>
+    Waiting for opponent move...
+  </div>
+  <div *ngIf="game?.status === 'FINISHED'">
+    Game ended !
+    <br>
+    <p>
+      <strong>{{ game.player.name }}:</strong> {{ scores.player }}
+      —
+      <strong>{{ game.opponent.name }}:</strong> {{ scores.opponent }}
+    </p>
+    <br>
+    Winner: <strong>{{ game[game.winner.toLowerCase()].name }}</strong>
+  </div>
+  <div *ngIf="game?.status === 'EXPIRED'">
+    Game Expired !
+  </div>
+  <ng-template #nzFooter></ng-template>
 </nz-modal>

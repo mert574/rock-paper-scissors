@@ -2,7 +2,6 @@
 
 <app-new-game-modal (create)="handleCreate()"></app-new-game-modal>
 <app-game-modal (choose)="handleChoose($event)"></app-game-modal>
-<input nz-input type="text" [(ngModel)]="playerId">
 <nz-list [nzDataSource]="games" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="false">
   <ng-template #item let-item>
     <nz-list-item [nzActions]="[playOrWatch]">
@@ -21,7 +20,7 @@
           <div [ngSwitch]="item.status">
             <em *ngIf="item.status === 'ACTIVE'">Waiting someone to join...</em>
             <span *ngSwitchCase="'PLAYING'">
-            Score: <strong> {{ calculateScores(item).player }} - {{ calculateScores(item).opponent }}</strong>
+            Score: <strong> {{ scores(item).player }} - {{ scores(item).opponent }}</strong>
           </span>
             <span *ngSwitchCase="'EXPIRED'">Expired</span>
             <span *ngSwitchCase="'FINISHED'">Expired</span>
@@ -33,7 +32,7 @@
                    [config]="{ stopTime: parseDate(item.game.currentRound.roundEndsAt) }"></countdown>
         <div [ngSwitch]="item.status">
           <button nz-button nzType="link" *ngSwitchCase="'ACTIVE'" (click)="handleJoinGame(item)">JOIN</button>
-          <button nz-button nzType="link" *ngSwitchCase="'PLAYING'" (click)="handleOpenModal(item)">WATCH</button>
+          <button nz-button nzType="link" *ngSwitchCase="'PLAYING'" (click)="handleOpenModal(item)">OPEN</button>
           <button nz-button nzType="link" disabled *ngSwitchDefault>FINISHED</button>
         </div>
       </ng-template>
