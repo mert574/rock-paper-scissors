@@ -1,4 +1,5 @@
 const entity = require("../entity");
+const {sendEvent} = require("../config/sse.config");
 
 // TODO: expired rps handling
 const ROUND_TIMEOUT_SEC = 30;
@@ -43,6 +44,7 @@ async function joinGame(gameId, opponent) {
   gameListing.game = game;
 
   await gameListing.save();
+  sendEvent(gameListing, "GAME_UPDATED");
   return gameListing;
 }
 
@@ -75,12 +77,17 @@ async function playGame(gameId, player, move) {
   await playGameRound(gameListing, move, moveKey);
 
   await gameListing.save();
+  sendEvent(gameListing, "GAME_UPDATED");
+
   return gameListing;
 }
 
 async function createPlayerGame(player) {
-  const game = entity.gameListing.create({player});
-  return game.save();
+  const gameListing = entity.gameListing.create({player});
+  await gameListing.save();
+
+  sendEvent(gameListing, "GAME_CREATED");
+  return gameListing;
 }
 
 // ---------------------
@@ -90,7 +97,7 @@ async function createPlayerGame(player) {
 setTimeout(() => {
   (async function checkExpiration() {
     const listings = await getAllGameListings();
-    listings.forEach(it => {
+    listings.forEach((it) => {
       if (it.status !== 'PLAYING') {
         return;
       }
@@ -98,7 +105,9 @@ setTimeout(() => {
         it.game.pastRounds.push(it.game.currentRound);
         it.game.currentRound = null;
         it.status = 'EXPIRED';
-        it.save();
+        it.save().then(gameListing => {
+          sendEvent(gameListing, "GAME_UPDATED");
+        });
 
         console.log("found a game that is expired!");
       }
