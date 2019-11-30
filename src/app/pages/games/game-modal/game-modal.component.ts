@@ -12,10 +12,10 @@ import {NzNotificationService} from 'ng-zorro-antd/notification';
   styleUrls: ['./game-modal.component.scss']
 })
 export class GameModalComponent {
-  private isVisible = false;
-  private game: Game = null;
-  private playerId: string;
-  private updateSubscription: Subscription;
+  isVisible = false;
+  game: Game = null;
+  playerId: string;
+  updateSubscription: Subscription;
 
   @Output() choose = new EventEmitter<object>();
 
@@ -93,7 +93,7 @@ export class GameModalComponent {
   }
 
   handleCancel(): void {
-    this.isVisible = false;
+    this.hideModal();
   }
 
   choice(choice: 'ROCK' | 'PAPER' | 'SCISSORS') {

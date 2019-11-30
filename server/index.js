@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message }).end();
 });
 
-initializeDB().then(generateMockData);
+initializeDB();//.then(generateMockData);
 
 app.listen(port, () => console.log(`RPS app listening on port ${port}!`));
 

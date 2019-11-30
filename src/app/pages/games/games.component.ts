@@ -22,9 +22,9 @@ export class GamesComponent implements OnInit {
     private notification: NzNotificationService) {
   }
 
-  private games: Game[];
-  private playerId: string;
-  private playerName: string;
+  games: Game[];
+  playerId: string;
+  playerName: string;
 
   @ViewChild(GameModalComponent, {static: true})
   private gameModal: GameModalComponent;

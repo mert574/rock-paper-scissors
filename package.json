@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "yarn serve & ng serve",
+    "start": "yarn serve & ng serve --disable-host-check",
     "build": "ng build",
-    "serve": "npx nodemon --watch ./server ./server/index.js --inspect",
+    "serve": "npx nodemon --watch ./server ./server/index.js",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
