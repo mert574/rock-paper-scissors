@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   baseUrl: 'http://localhost:6378',
+  eventSourceUrl: 'http://localhost:6378/api/stream'
 };
 
 /*
