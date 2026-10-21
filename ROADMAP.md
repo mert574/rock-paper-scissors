@@ -19,9 +19,12 @@
 - Add configurable match length and round timers.
 - Preserve match history across server restarts with persistent storage.
 - Add match details with round results, score summaries and filtering.
+- Add a leaderboard showing player rankings, wins, losses and draws.
 
 ## Interface
 
 - Redesign the lobby, match screen, history and surrounding page layout.
+- Give the interface a more game-like presentation with player cards, clear scoreboards and prominent round and match results.
+- Add animations for move selection, countdowns, simultaneous reveals, round results and match victories.
 - Expand nickname setup into a guided join flow.
 - Improve mobile layouts, keyboard controls, loading states and round-result feedback.
