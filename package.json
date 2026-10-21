@@ -11,6 +11,7 @@
     "e2e": "ng e2e"
   },
   "private": true,
+  "license": "MIT",
   "dependencies": {
     "@angular/animations": "~8.2.7",
     "@angular/common": "~8.2.7",

@@ -22,9 +22,12 @@ export class GamesComponent implements OnInit {
     private notification: NzNotificationService) {
   }
 
-  games: Game[];
+  games: Game[] = [];
   playerId: string;
   playerName: string;
+  needsNickname = false;
+  nickname = '';
+  registering = false;
 
   @ViewChild(GameModalComponent, {static: true})
   private gameModal: GameModalComponent;
@@ -39,14 +42,7 @@ export class GamesComponent implements OnInit {
     };
 
     if (!savedPlayer.id || !savedPlayer.name) {
-      // Player not found, go ahead and register.
-      // Since we don't have a proper user implementation; just ask a nickname.
-      let name: string;
-      do {
-        name = prompt('Please enter a nickname');
-      } while (!name || name.length < 2 || name.length > 20);
-
-      this.registerPlayer(name);
+      this.needsNickname = true;
     } else {
       this.players.getPlayerById(savedPlayer.id)
         .subscribe(({_id, name}: Player) => {
@@ -78,16 +74,35 @@ export class GamesComponent implements OnInit {
   }
 
   registerPlayer(nickname: string) {
+    nickname = nickname.trim();
+    if (this.registering || nickname.length < 2 || nickname.length > 20) {
+      this.needsNickname = true;
+      return;
+    }
+    this.registering = true;
     this.players.register(nickname).subscribe(({_id, name}: Player) => {
       localStorage.setItem('playerId', _id);
       localStorage.setItem('playerName', name);
       this.playerId = _id;
       this.playerName = name;
+      this.needsNickname = false;
+      this.registering = false;
+    }, () => {
+      this.needsNickname = true;
+      this.registering = false;
+      this.nickname = nickname;
+      this.notification.error('Join lobby', 'Could not register your nickname. Please try again.');
     });
   }
 
   handleCreate = () => {
-    this.api.createGame(this.playerId).subscribe();
+    if (!this.playerId) {
+      this.needsNickname = true;
+      return;
+    }
+    this.api.createGame(this.playerId).subscribe({
+      error: () => this.notification.error('Create game', 'Could not create the game. Please try again.')
+    });
   }
 
   handleJoinGame = (game: Game) => {

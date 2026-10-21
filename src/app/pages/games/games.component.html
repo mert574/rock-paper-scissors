@@ -1,13 +1,18 @@
 <h1 nz-title>Active Games <span *ngIf="games">({{ games.length }})</span></h1>
 
-<app-new-game-modal (create)="handleCreate()"></app-new-game-modal>
+<form *ngIf="needsNickname" (ngSubmit)="registerPlayer(nickname)" class="nickname-form">
+  <label for="nickname">Choose a nickname</label>
+  <input nz-input id="nickname" name="nickname" [(ngModel)]="nickname" minlength="2" maxlength="20" required placeholder="2–20 characters" />
+  <button nz-button nzType="primary" type="submit" [nzLoading]="registering" [disabled]="registering || nickname.trim().length < 2">Join lobby</button>
+</form>
+<app-new-game-modal [disabled]="!playerId" (create)="handleCreate()"></app-new-game-modal>
 <app-game-modal (choose)="handleChoose($event)"></app-game-modal>
 <nz-list [nzDataSource]="games" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="false">
   <ng-template #item let-item>
     <nz-list-item [nzActions]="[playOrWatch]">
       <nz-list-item-meta
         [nzTitle]="nzTitle"
-        nzAvatar="/assets/game.png"
+        nzAvatar="/assets/game.svg"
         [nzDescription]="nzDescription"
       >
         <ng-template #nzTitle>
@@ -31,7 +36,7 @@
         <countdown *ngIf="item.status === 'PLAYING'"
                    [config]="{ stopTime: parseDate(item.game.currentRound.roundEndsAt) }"></countdown>
         <div [ngSwitch]="item.status">
-          <button nz-button nzType="link" *ngSwitchCase="'ACTIVE'" (click)="handleJoinGame(item)">JOIN</button>
+          <button nz-button nzType="link" *ngSwitchCase="'ACTIVE'" [disabled]="!playerId" (click)="handleJoinGame(item)">JOIN</button>
           <button nz-button nzType="link" *ngSwitchCase="'PLAYING'" (click)="handleOpenModal(item)">OPEN</button>
           <button nz-button nzType="link" disabled *ngSwitchDefault>FINISHED</button>
         </div>
